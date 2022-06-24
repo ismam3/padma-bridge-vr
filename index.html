@@ -1,0 +1,133 @@
+<html>
+    <head>
+        <script src="a-frame/1-1-0.min.js"></script>
+        <!-- <script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script> -->
+        <script src="a-frame/teleport-control.min.js"></script>
+        <script src="a-frame/extras.min.js"></script>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#87CEEB">
+
+        <link rel="manifest" href="manifest.json">
+        <link rel="apple-touch-icon" href="icons/192.png">
+        
+        <meta name="description" content="The Padma Multipurpose Bridge is in VR. You can on the greatest Padma Bridge through your device. ">
+        <meta name="keywords" content="Padma,Padma Multipurpose Bridge VR, VR, webVR, webXR, Podda setu, Padma Setu">  
+ 
+
+        <title>Padma Bridge in VR</title>
+        <script>
+            alert("Caution: The performance of this application may be varied due to internet speed and your device. Please keep your patience!")
+        </script>
+    </head>
+    <body style="user-select: none; -webkit-app-region:drag;">
+
+        <a-scene loading-screen="dotsColor: blue; backgroundColor:skyblue" vr-mode-ui="enabled:true" physics="debug: false">
+            <!-- assets -->
+            <a-assets>
+                <!-- <img id="brick" src="textures/brick_texture.jpg"> -->
+                <img id="sky" src="textures/clear_sky.jpeg">
+                <a-asset-item id="model" src="models/pmb@1.0.0.glb"></a-asset-item>
+                <a-asset-item id="nav-mesh" src="models/nav-mesh@1.0.0.glb"></a-asset-item>
+                
+            </a-assets>
+            
+            <!-- <a-entity environment="preset: forest;fog:0;dressing:none;ground:flat;shadow:true;skyType:atmosphere;lighting:none" scale="1 1 1"></a-entity> -->
+
+            <a-entity rotation="0 0 0" position="-215.47144 -31.243 384.58831" gltf-model="#model" scale="1 1 1">
+            </a-entity>
+            
+            <a-entity mesh rotation="0 0 0" position="-215.47144 -31.243 384.58831" gltf-model="#nav-mesh" scale="1 1 1">
+            </a-entity>
+
+
+		<a-sky src="#sky" scale="15 15 15"></a-sky>
+
+
+            <!-- 28 33 0 -->
+        <a-entity id="controller">
+                <a-entity id="cameraRig" position="0 1.2 0" >
+                    <a-entity id="head" position="0 0 0" camera="userHeight:1.2" look-controls="pointerLockEnabled:true">
+                        <a-entity position="0.1 -0.1 0"
+                            touch-listener
+                            teleport-controls=
+                                "cameraRig: #cameraRig;
+                                teleportOrigin: #head;
+                                startEvents:starttouch;
+                                endEvents:endtouch;
+                                curveShootingSpeed:10;
+                                hitCylinderRadius:0.1;
+                                collisionEntities: [mesh]"
+                        >
+                        <!-- collisionEntities: [mesh] -->
+                        </a-entity>
+                        <a-cursor></a-cursor>
+                    </a-entity>
+                </a-entity>
+        </a-entity>
+            
+        
+        </a-scene>
+        <script>
+            AFRAME.registerComponent('touch-listener', {
+                init: function () {
+                    var targetEl = this.el;
+
+                    //Create the touchstart event
+                    document.querySelector('a-scene').addEventListener('touchstart', function () {
+                    targetEl.emit('starttouch')
+                    })
+
+                    document.querySelector('a-scene').addEventListener('mousedown', function () {
+                    targetEl.emit('starttouch')
+                    })
+
+                    document.body.addEventListener('keydown', function (e) {
+                    if (e.keyCode == 32) {
+                        console.log('space key pressed!');
+                        targetEl.emit('starttouch');      
+                    }  
+                    })
+                    
+                    //Create the touchend event
+                    document.querySelector('a-scene').addEventListener('touchend', function () {
+                    targetEl.emit('endtouch')
+                    })
+                    
+                    document.querySelector('a-scene').addEventListener('mouseup', function () {
+                    targetEl.emit('endtouch')
+                    })
+                    
+                    document.body.addEventListener('keyup', function (e) {
+                    if (e.keyCode == 32) {
+                        console.log('space key released!');
+                        targetEl.emit('endtouch');      
+                    }  
+                    })
+
+                    
+                }
+                });
+
+                if("serviceWorker" in navigator){
+                    navigator.serviceWorker.register("sw.js").then(registration=>{
+                        console.log("Service Worker registered!");
+                        console.log(registration);
+                    }).catch(error=>{
+                        console.log("Service Worker registration failed")
+                        console.log(error);
+                    })
+                }
+
+		        document.querySelector("a-scene").addEventListener("enter-vr",function (){
+                    document.querySelector("#controller").innerHTML = "<a-entity movement-controls='constrainToNavMesh:True'><a-entity position='0 1.6 0' camera look-controls></a-entity></a-entity>"
+                })
+
+                document.querySelector("a-scene").addEventListener("exit-vr",function (){
+                    document.querySelector("#controller").innerHTML = "<a-entity id='cameraRig' position='0 1.2 0'><a-entity id='head' position='0 0 0' camera='userHeight:1.2' look-controls='pointerLockEnabled:true'><a-entity position='0.1 -0.1 0' touch-listener teleport-controls='cameraRig: #cameraRig;teleportOrigin: #head;startEvents:starttouch;endEvents:endtouch;curveShootingSpeed:3;hitCylinderRadius:0.1;collisionEntities: [mesh]'></a-entity></a-entity></a-entity>"
+                })
+
+        </script>
+    </body>
+</html>
